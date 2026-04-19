@@ -32,7 +32,7 @@ CONFIG = {
             'region_name': 'US Market',
             'lang': 'en',
             'country': 'us',
-            'keywords': 'stock market earnings economy investor trading ipo merger acquisition financial'
+            'keywords': 'stock market earnings economy nasdaq'
         }
     ],
     # API configuration
@@ -49,13 +49,63 @@ CONFIG = {
 }
 
 
+def load_keywords():
+    """
+    Load keywords from config.txt file
+    
+    Returns:
+        Space-separated keyword string
+    """
+    config_file = Path(__file__).parent / "config.txt"
+    
+    if not config_file.exists():
+        print(f"⚠️ Warning: {config_file} not found, using default keywords")
+        return "stock market earnings economy nasdaq"
+    
+    try:
+        keywords = []
+        in_keywords_section = False
+        
+        with open(config_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                
+                # Detect keywords section
+                if 'Keywords Configuration' in line:
+                    in_keywords_section = True
+                    continue
+                
+                # Skip empty lines and comments
+                if not line or line.startswith('#'):
+                    continue
+                
+                # Stop at next section or key=value
+                if in_keywords_section and '=' in line:
+                    break
+                
+                if in_keywords_section:
+                    keywords.append(line)
+        
+        if not keywords:
+            print(f"⚠️ Warning: No keywords found in {config_file}, using default")
+            return "stock market earnings economy nasdaq"
+        
+        keyword_string = " ".join(keywords)
+        print(f"✅ Loaded keywords from {config_file}: {keyword_string}")
+        return keyword_string
+    
+    except Exception as e:
+        print(f"❌ Error reading config file: {e}")
+        return "stock market earnings economy nasdaq"
+
+
 def load_config():
     """Load configuration from CONFIG dict"""
     return CONFIG
 
 
 # ========== 2. API Key ==========
-API_KEY = "01eb7b9c3bc8879fd50b68cfb11aeba8"
+API_KEY = "d5b5e11a8e9db9df2387d384eb8857ec"
 
 # ========== 2b. Embedding Model ==========
 EMBEDDING_MODEL = SentenceTransformer('all-MiniLM-L6-v2')
@@ -297,6 +347,10 @@ def main():
     print("=" * 80)
     print()
     
+    # Load keywords from keywords.txt file
+    keywords = load_keywords()
+    print()
+    
     api_config = config.get('api', {})
     display_config = config.get('display', {})
     
@@ -312,7 +366,6 @@ def main():
         region_name = source.get('region_name')
         lang = source.get('lang')
         country = source.get('country')
-        keywords = source.get('keywords', '')
         
         print("=" * 80)
         print(f"🌐 {region_name}")

@@ -1,0 +1,27 @@
+# ============================================================================
+# Business Agent - Unified Configuration
+# ============================================================================
+
+# ============================================================================
+# Email Configuration
+# ============================================================================
+EMAIL=
+PASSWORD=
+
+# ============================================================================
+# Azure OpenAI Configuration (For News Summarization)
+# ============================================================================
+AZURE_API_KEY=f5ab14444ae44f6c85186e4697fd6186
+AZURE_API_VERSION=2025-02-01-preview
+AZURE_ENDPOINT=https://hkust.azure-api.net
+AZURE_MODEL=gpt-4o
+
+# ============================================================================
+# Keywords Configuration
+# Add one keyword per line - these will be used for news filtering and analysis
+# ============================================================================
+stock
+market
+earnings
+economy
+nasdaq
