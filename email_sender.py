@@ -6,6 +6,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
 from email.header import Header
 from email.utils import formataddr, formatdate, make_msgid
+from email.policy import SMTP
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, List
@@ -153,6 +154,12 @@ def send_html_email(
         bool: 发送是否成功
     """
     try:
+        # 清理密码中的特殊字符
+        password_clean = password.replace('\xa0', ' ')  # 替换不可断空格
+        
+        # 清理HTML内容中的特殊字符，防止编码错误
+        html_content = html_content.replace('\xa0', ' ')  # 替换不可断空格为普通空格
+        
         # 获取SMTP配置
         if custom_smtp_server and custom_smtp_port:
             smtp_server = custom_smtp_server
@@ -172,6 +179,7 @@ def send_html_email(
         msg["Date"] = formatdate(localtime=True)
         msg["Message-ID"] = make_msgid()
         msg["MIME-Version"] = "1.0"
+        msg["Content-Type"] = "multipart/related; charset=utf-8"
         
         # 添加HTML内容
         msg_alternative = MIMEMultipart("alternative")
@@ -209,8 +217,9 @@ def send_html_email(
             else:
                 server = smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=30)
             
-            server.login(from_email, password)
-            server.send_message(msg)
+            server.login(from_email, password_clean)
+            # 改用 send_message 并用 SMTP policy
+            server.send_message(msg, from_addr=from_email, to_addrs=to_emails)
             server.quit()
             
             print(f"✅ Email sent successfully to {', '.join(to_emails)}")
