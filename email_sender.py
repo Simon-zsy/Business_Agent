@@ -14,16 +14,10 @@ import urllib.request
 
 
 def load_config(config_file: str = "config.txt") -> dict:
-    """
-    从统一的 config.txt 加载邮箱、keywords 和 Azure 配置
-    
-    Returns:
-        包含 email, password, keywords, azure_api_key, azure_config 的字典
-    """
     config_path = Path(config_file)
     
     if not config_path.exists():
-        raise FileNotFoundError(f"找不到 {config_file} 文件")
+        raise FileNotFoundError(f"Cannot find {config_file} file")
     
     config = {
         'email': None,
@@ -41,20 +35,16 @@ def load_config(config_file: str = "config.txt") -> dict:
         for line in f:
             line = line.strip()
             
-            # 识别Keywords节
             if 'Keywords Configuration' in line:
                 in_keywords_section = True
                 continue
             
-            # 识别其他节（停止关键词读取）
             if in_keywords_section and 'Configuration' in line:
                 in_keywords_section = False
             
-            # 跳过空行和注释
             if not line or line.startswith('#'):
                 continue
             
-            # 解析配置项
             if '=' in line:
                 key, value = line.split('=', 1)
                 key = key.strip()
@@ -73,25 +63,21 @@ def load_config(config_file: str = "config.txt") -> dict:
                 elif key == 'AZURE_MODEL':
                     config['azure_model'] = value
                 
-                # 进入关键词section后不再读key=value
                 in_keywords_section = False
             
-            # 在Keywords section中的非注释行是关键词
             elif in_keywords_section and line:
                 config['keywords'].append(line)
     
-    # 验证必要字段
     if not config['email']:
-        raise ValueError("config.txt 缺少 EMAIL 配置")
+        raise ValueError("config.txt is missing EMAIL configuration")
     if not config['password']:
-        raise ValueError("config.txt 缺少 PASSWORD 配置")
+        raise ValueError("config.txt is missing PASSWORD configuration")
     if not config['keywords']:
-        raise ValueError("config.txt 缺少 KEYWORDS 配置")
+        raise ValueError("config.txt is missing KEYWORDS configuration")
     
     return config
 
 
-# SMTP 配置（支持常见邮箱服务商）
 SMTP_CONFIGS = {
     "gmail.com": {"server": "smtp.gmail.com", "port": 587, "encryption": "TLS"},
     "qq.com": {"server": "smtp.qq.com", "port": 465, "encryption": "SSL"},
@@ -105,21 +91,12 @@ SMTP_CONFIGS = {
 
 
 def get_smtp_config(email: str) -> dict:
-    """
-    获取邮箱对应的SMTP配置
-    
-    Args:
-        email: 邮箱地址
-    
-    Returns:
-        SMTP配置字典或默认配置
-    """
+
     domain = email.split("@")[-1].lower()
     
     if domain in SMTP_CONFIGS:
         return SMTP_CONFIGS[domain]
     
-    # 默认配置
     return {
         "server": f"smtp.{domain}",
         "port": 587,
@@ -138,29 +115,13 @@ def send_html_email(
     custom_smtp_port: Optional[int] = None,
 ) -> bool:
     """
-    发送HTML格式的邮件，支持图片附件
-    
-    Args:
-        from_email: 发件人邮箱
-        password: 邮箱密码/授权码
-        to_emails: 收件人邮箱列表
-        subject: 邮件主题
-        html_content: HTML内容
-        image_url: 图片URL（可选）
-        custom_smtp_server: 自定义SMTP服务器
-        custom_smtp_port: 自定义SMTP端口
-    
-    Returns:
-        bool: 发送是否成功
+    send the generated HTML report via email with optional heatmap image attachment
     """
     try:
-        # 清理密码中的特殊字符
-        password_clean = password.replace('\xa0', ' ')  # 替换不可断空格
+        password_clean = password.replace('\xa0', ' ')  # substitute the non-breaking space
         
-        # 清理HTML内容中的特殊字符，防止编码错误
-        html_content = html_content.replace('\xa0', ' ')  # 替换不可断空格为普通空格
+        html_content = html_content.replace('\xa0', ' ')  # substitute the non-breaking space with a regular space
         
-        # 获取SMTP配置
         if custom_smtp_server and custom_smtp_port:
             smtp_server = custom_smtp_server
             smtp_port = int(custom_smtp_port)
@@ -171,7 +132,6 @@ def send_html_email(
             smtp_port = config["port"]
             use_tls = config["encryption"] == "TLS"
         
-        # 构建邮件
         msg = MIMEMultipart("related")
         msg["From"] = formataddr(("Business Agent", from_email))
         msg["To"] = ", ".join(to_emails)
@@ -181,20 +141,16 @@ def send_html_email(
         msg["MIME-Version"] = "1.0"
         msg["Content-Type"] = "multipart/related; charset=utf-8"
         
-        # 添加HTML内容
         msg_alternative = MIMEMultipart("alternative")
         msg.attach(msg_alternative)
         
-        # 添加纯文本备选
         text_content = f"Business Agent News Report\n\nPlease use HTML-supported email client to view this email."
         text_part = MIMEText(text_content, "plain", "utf-8")
         msg_alternative.attach(text_part)
         
-        # 添加HTML内容
         html_part = MIMEText(html_content, "html", "utf-8")
         msg_alternative.attach(html_part)
         
-        # 添加图片附件（如果提供了URL）
         if image_url:
             try:
                 print(f"📥 Downloading image from {image_url[:50]}...")
@@ -209,7 +165,6 @@ def send_html_email(
         
         print(f"🔐 Connecting to SMTP: {smtp_server}:{smtp_port}")
         
-        # 连接并发送
         try:
             if use_tls:
                 server = smtplib.SMTP(smtp_server, smtp_port, timeout=30)
@@ -218,7 +173,6 @@ def send_html_email(
                 server = smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=30)
             
             server.login(from_email, password_clean)
-            # 改用 send_message 并用 SMTP policy
             server.send_message(msg, from_addr=from_email, to_addrs=to_emails)
             server.quit()
             
@@ -251,22 +205,10 @@ def generate_report_with_heatmap(
     title: str = "Business News Report"
 ) -> str:
     """
-    生成包含按关键词分类新闻的HTML报告，支持气泡图和AI总结
-    
-    Args:
-        trending_keywords: 热词列表 [(keyword, count), ...]
-        articles: 文章列表
-        keywords_list: 配置中的关键词列表
-        image_url: 气泡图URL（可选）
-        summary_text: AI生成的总结文本（可选）
-        title: 报告标题
-    
-    Returns:
-        HTML字符串
+    generate the HTML report content with optional heatmap image and AI summary
     """
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    # 构建趋势关键词部分
     keywords_html = ""
     if trending_keywords:
         keywords_html = "<h2>🔥 Trending Keywords</h2><table border='1' cellpadding='10' style='width:100%; border-collapse:collapse;'>"
@@ -282,7 +224,6 @@ def generate_report_with_heatmap(
             """
         keywords_html += "</table>"
     
-    # 构建气泡图部分
     heatmap_html = ""
     if image_url:
         heatmap_html = f"""
@@ -292,7 +233,6 @@ def generate_report_with_heatmap(
         </div>
         """
     
-    # 构建AI总结部分
     summary_html = ""
     if summary_text:
         summary_html = f"""
@@ -302,7 +242,6 @@ def generate_report_with_heatmap(
         </div>
         """
     
-    # 按关键词分类文章
     articles_by_keyword = {}
     for keyword in keywords_list:
         articles_by_keyword[keyword] = []
@@ -312,7 +251,6 @@ def generate_report_with_heatmap(
         if top_keyword in articles_by_keyword:
             articles_by_keyword[top_keyword].append(article)
     
-    # 构建按类别分组的文章部分
     articles_html = "<h2>📰 News by Category</h2>"
     article_count = 0
     
@@ -321,7 +259,7 @@ def generate_report_with_heatmap(
         if keyword_articles:
             articles_html += f"<h3 style='color: #ff6b6b; margin-top: 20px;'>📌 {keyword.upper()} ({len(keyword_articles)} articles)</h3>"
             
-            for article in keyword_articles[:5]:  # 每个类别最多5篇
+            for article in keyword_articles[:5]:  
                 article_count += 1
                 similarity = article.get('similarity_score', 0)
                 title_text = article.get('title', '')
@@ -447,7 +385,7 @@ def load_email_config(config_file: str = "email_config.txt") -> dict:
         # Try config.txt instead
         config_path = Path("config.txt")
         if not config_path.exists():
-            raise FileNotFoundError(f"找不到配置文件")
+            raise FileNotFoundError(f"File not found: {config_file}")
     
     config = load_config(str(config_path))
     return {
@@ -458,7 +396,6 @@ def load_email_config(config_file: str = "email_config.txt") -> dict:
 
 
 if __name__ == "__main__":
-    # 示例：发送测试邮件
     sample_keywords = [
         ('stock', 7),
         ('earnings', 3),
@@ -498,11 +435,10 @@ if __name__ == "__main__":
         trending_keywords=sample_keywords,
         articles=sample_articles,
         keywords_list=keywords_list,
-        image_url=None,  # Optional: add heatmap URL here
+        image_url=None,  
         title="Business News Intelligence Report"
     )
     
-    # 从 config.txt 加载配置
     try:
         config = load_config()
         success = send_html_email(
@@ -515,13 +451,13 @@ if __name__ == "__main__":
         )
         
         if success:
-            print("✅ 邮件发送成功！")
+            print("✅ Successfully sent test email with generated report!")
         else:
-            print("❌ 邮件发送失败，请检查配置。")
+            print("❌ Failed to send test email. Please check the configuration.")
     
     except FileNotFoundError as e:
-        print(f"❌ 错误: {e}")
-        print("请先编辑 config.txt 文件，填入你的邮箱信息。")
+        print(f"❌ Error: {e}")
+        print("Please edit the config.txt file and enter your email information.")
     except ValueError as e:
-        print(f"❌ 配置错误: {e}")
-        print("请检查 config.txt 是否包含所有必要字段。")
+        print(f"❌ Error: {e}")
+        print("Please check the config.txt file for missing configurations.")
