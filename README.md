@@ -139,11 +139,11 @@ pip install openai sentence-transformers torch PyPDF2
 
 (`PyPDF2` is only needed if your resume is a PDF — skip it if using a `.txt` file.)
 
-**2. Get an Adzuna API key**
+**2. Get a JSearch API key**
 
-1. Go to [https://developer.adzuna.com](https://developer.adzuna.com) and create a free account.
-2. Register an application — you will receive an **App ID** and an **App Key**.
-3. The free tier allows 250 requests/day, which is more than enough for this pipeline.
+1. Go to [https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch](https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch) and sign up for RapidAPI (free).
+2. Subscribe to the JSearch API — the free tier gives 200 requests/month.
+3. Copy your **RapidAPI Key** from the dashboard.
 
 **3. Write your resume**
 
@@ -181,10 +181,8 @@ AZURE_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_MODEL=gpt-4o
 
 # Job Search Configuration
-ADZUNA_APP_ID=your_adzuna_app_id
-ADZUNA_APP_KEY=your_adzuna_app_key
-JOB_COUNTRY=us
-JOB_LOCATION=New York
+JSEARCH_API_KEY=your_rapidapi_key
+JOB_LOCATION=Hong Kong
 JOB_TOP_N=20
 RESUME_PATH=resume.txt
 DOUBAO_API_KEY=your_doubao_api_key
@@ -224,7 +222,7 @@ The terminal will print a ranked table of the top matches, and you will receive 
 | GNews API key | `news_agent/news.py` | [gnews.io](https://gnews.io) — free, 100 req/day |
 | Azure OpenAI key | both agents | [portal.azure.com](https://portal.azure.com) — deploy a GPT-4o model |
 | Doubao API key | `news_agent/heatmap.py`, `job_agent/config.txt` | [console.volcengine.com](https://console.volcengine.com) → Ark |
-| Adzuna App ID + Key | `job_agent` | [developer.adzuna.com](https://developer.adzuna.com) — free, 250 req/day |
+| JSearch API key (RapidAPI) | `job_agent` | [rapidapi.com → JSearch](https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch) — free, 200 req/month |
 | Gmail App Password | both agents | Google Account → Security → App Passwords |
 
 ### Gmail App Password

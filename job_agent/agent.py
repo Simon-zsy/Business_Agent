@@ -98,7 +98,7 @@ def main():
         keywords=profile['roles'],
         location=config['job_location'],
         api_key=config['jsearch_api_key'],
-        max_results=100,  # Fetch more before filtering, then trim to top_n
+        max_results=80,  # JSearch free tier is slow; 3 pages is a good balance
     )
 
     if not jobs:

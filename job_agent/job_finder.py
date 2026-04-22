@@ -75,10 +75,14 @@ def fetch_jobs_jsearch(
 
     # Use just the first keyword to keep the query broad enough to return results.
     # JSearch is sensitive to overly specific queries — shorter is better.
+    # Strip the word "intern/internship" from the role if present to avoid
+    # duplicates like "intern Finance Intern Hong Kong".
     role = keywords[0] if keywords else 'business'
+    role_clean = role.lower().replace('intern', '').replace('internship', '').strip()
+    role_clean = role_clean or 'business'
     location_str = location or 'Hong Kong'
     queries_to_try = [
-        f"intern {role} {location_str}",
+        f"intern {role_clean} {location_str}",
         f"internship {location_str}",          # broad fallback
     ]
 

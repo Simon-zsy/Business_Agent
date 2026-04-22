@@ -23,7 +23,7 @@ AZURE_MODEL=gpt-4o
 JSEARCH_API_KEY=0222aac51dmshfaac24ae4b56ad2p110e68jsn4fe23a434253
 JOB_LOCATION=Hong Kong
 JOB_TOP_N=20
-RESUME_PATH=resume.txt
+RESUME_PATH=Siyu_Zhou_s_Resume.pdf
 DOUBAO_API_KEY=ark-3ebef06a-ba66-402d-9d1f-d17716f848f9-c3f3f
 
 # ============================================================================
