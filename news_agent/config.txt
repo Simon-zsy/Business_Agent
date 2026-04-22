@@ -1,12 +1,12 @@
 # ============================================================================
-# Business Agent - Unified Configuration
+# Business Agent — News Pipeline Configuration
 # ============================================================================
 
 # ============================================================================
 # Email Configuration
 # ============================================================================
-EMAIL=
-PASSWORD=
+EMAIL=drawiser77@gmail.com
+PASSWORD=bhym riot neqz rfmm
 
 # ============================================================================
 # Azure OpenAI Configuration (For News Summarization)
@@ -18,7 +18,7 @@ AZURE_MODEL=gpt-4o
 
 # ============================================================================
 # Keywords Configuration
-# Add one keyword per line - these will be used for news filtering and analysis
+# Add one keyword per line - used for news filtering and analysis
 # ============================================================================
 stock
 market

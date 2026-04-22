@@ -26,30 +26,46 @@ def load_config(config_file: str = "config.txt") -> dict:
         'azure_api_key': None,
         'azure_api_version': '2025-02-01-preview',
         'azure_endpoint': 'https://hkust.azure-api.net',
-        'azure_model': 'gpt-5-mini'
+        'azure_model': 'gpt-5-mini',
+        # Job search settings
+        'adzuna_app_id': None,
+        'adzuna_app_key': None,
+        'job_country': 'us',
+        'job_location': '',
+        'job_top_n': 20,
+        'resume_path': 'resume.txt',
+        'target_companies': [],
     }
-    
+
     in_keywords_section = False
-    
+    in_companies_section = False
+
     with open(config_path, 'r', encoding='utf-8') as f:
         for line in f:
             line = line.strip()
-            
+
             if 'Keywords Configuration' in line:
                 in_keywords_section = True
+                in_companies_section = False
                 continue
-            
-            if in_keywords_section and 'Configuration' in line:
+
+            if 'Target Companies' in line:
+                in_companies_section = True
                 in_keywords_section = False
-            
+                continue
+
+            if (in_keywords_section or in_companies_section) and 'Configuration' in line:
+                in_keywords_section = False
+                in_companies_section = False
+
             if not line or line.startswith('#'):
                 continue
-            
+
             if '=' in line:
                 key, value = line.split('=', 1)
                 key = key.strip()
                 value = value.strip()
-                
+
                 if key == 'EMAIL':
                     config['email'] = value
                 elif key == 'PASSWORD':
@@ -62,18 +78,32 @@ def load_config(config_file: str = "config.txt") -> dict:
                     config['azure_endpoint'] = value
                 elif key == 'AZURE_MODEL':
                     config['azure_model'] = value
-                
+                elif key == 'ADZUNA_APP_ID':
+                    config['adzuna_app_id'] = value
+                elif key == 'ADZUNA_APP_KEY':
+                    config['adzuna_app_key'] = value
+                elif key == 'JOB_COUNTRY':
+                    config['job_country'] = value
+                elif key == 'JOB_LOCATION':
+                    config['job_location'] = value
+                elif key == 'JOB_TOP_N':
+                    config['job_top_n'] = int(value)
+                elif key == 'RESUME_PATH':
+                    config['resume_path'] = value
+
                 in_keywords_section = False
-            
+                in_companies_section = False
+
             elif in_keywords_section and line:
                 config['keywords'].append(line)
+
+            elif in_companies_section and line:
+                config['target_companies'].append(line)
     
     if not config['email']:
         raise ValueError("config.txt is missing EMAIL configuration")
     if not config['password']:
         raise ValueError("config.txt is missing PASSWORD configuration")
-    if not config['keywords']:
-        raise ValueError("config.txt is missing KEYWORDS configuration")
     
     return config
 

@@ -1,0 +1,42 @@
+# ============================================================================
+# Business Agent — Job Finder Configuration
+# ============================================================================
+
+# ============================================================================
+# Email Configuration
+# ============================================================================
+EMAIL=drawiser77@gmail.com
+PASSWORD=bhym riot neqz rfmm
+
+# ============================================================================
+# Azure OpenAI Configuration (For Resume Profile Extraction)
+# ============================================================================
+AZURE_API_KEY=f5ab14444ae44f6c85186e4697fd6186
+AZURE_API_VERSION=2025-02-01-preview
+AZURE_ENDPOINT=https://hkust.azure-api.net
+AZURE_MODEL=gpt-4o
+
+# ============================================================================
+# Job Search Configuration
+# Sign up free at: https://developer.adzuna.com to get APP_ID and APP_KEY
+# ============================================================================
+ADZUNA_APP_ID=your_app_id_here
+ADZUNA_APP_KEY=your_app_key_here
+JOB_COUNTRY=us
+JOB_LOCATION=New York
+JOB_TOP_N=20
+RESUME_PATH=resume.txt
+DOUBAO_API_KEY=your_doubao_api_key_here
+
+# ============================================================================
+# Target Companies (whitelist — one per line, no = sign)
+# Agent will prioritise results from these companies
+# ============================================================================
+Google
+Meta
+Microsoft
+Amazon
+ByteDance
+Goldman Sachs
+JPMorgan
+McKinsey
