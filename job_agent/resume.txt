@@ -1,0 +1,56 @@
+Simon
+fake@gmail.com | linkedin.com/in/simon-zhang | Hong Kong
+
+EDUCATION
+---------
+BBA Business Management, Hong Kong University of Science and Technology (HKUST)
+Expected Graduation: May 2026 | GPA: 3.6 / 4.0
+
+Relevant Coursework: Financial Accounting, Corporate Finance, Marketing Management,
+Business Strategy, Organizational Behavior, Business Analytics, Macroeconomics,
+Investment Analysis, Supply Chain Management
+
+SKILLS
+------
+Analytics:   Excel (advanced), PowerPoint, Tableau, Power BI
+Finance:     Financial Modeling, DCF Valuation, Bloomberg Terminal
+Tools:       Python (basic), SQL (basic), Salesforce, HubSpot
+Languages:   English (fluent), Cantonese (native), Mandarin (native)
+
+EXPERIENCE
+----------
+Finance Intern — KPMG Hong Kong                                Jun 2024 – Aug 2024
+- Assisted audit team on due diligence for 3 M&A transactions (total deal value HKD 2.4B)
+- Built financial models in Excel to forecast revenue and cost synergies
+- Prepared client-facing PowerPoint decks summarizing key findings for senior management
+
+Business Development Intern — L'Oréal Hong Kong               Jan 2024 – May 2024
+- Conducted market research on Gen Z beauty trends across 5 Asian markets
+- Analysed competitor pricing strategies and presented recommendations to regional VP
+- Supported launch campaign for a new skincare line, contributing to 12% above-target sales
+
+Marketing Research Assistant — HKUST Business School          Sep 2023 – Dec 2023
+- Collected and coded survey data for a consumer behaviour study (n=400)
+- Produced summary reports using Excel pivot tables and charts
+- Findings contributed to a journal paper on brand loyalty in emerging markets
+
+PROJECTS
+--------
+Equity Research Report — Alibaba Group (HKUST Finance Society)
+- Authored a 20-page initiating coverage report with DCF and comparable company analysis
+- Pitched BUY recommendation to a panel of industry judges; ranked Top 3 out of 18 teams
+
+ESG Strategy Consulting Case (HKUST × McKinsey Case Competition 2024)
+- Led a team of 4 to develop a sustainability roadmap for a fictional FMCG company
+- Presented to McKinsey consultants; advanced to semi-final round
+
+Consumer Insights Study — Hong Kong Retail Industry
+- Designed and distributed a survey to 200 respondents on post-pandemic shopping habits
+- Visualised findings in Tableau and delivered a presentation to HKUST faculty
+
+AWARDS & ACTIVITIES
+-------------------
+- Dean's List — HKUST School of Business (2023, 2024)
+- Vice President, HKUST Finance Society (200+ members)
+- Participant, CFA Institute Research Challenge 2024 (Hong Kong regional)
+- Volunteer, Junior Achievement Hong Kong — financial literacy workshops for secondary students

@@ -1,6 +1,6 @@
 """
-Job Finder - Fetches internship listings from Adzuna API, filters by company whitelist,
-and ranks results by semantic similarity to the candidate's resume.
+Job Finder - Fetches internship listings from JSearch API (via RapidAPI), filters by
+company whitelist, and ranks results by semantic similarity to the candidate's resume.
 """
 
 import json
@@ -33,68 +33,95 @@ def _get_model() -> SentenceTransformer:
 # 1. Fetching
 # ---------------------------------------------------------------------------
 
-def fetch_jobs_adzuna(
+def _normalize_jsearch_job(raw: dict) -> dict:
+    """Convert a JSearch result dict to the common internal format."""
+    city    = raw.get('job_city') or ''
+    country = raw.get('job_country') or ''
+    location_str = ', '.join(filter(None, [city, country]))
+    return {
+        'company':  {'display_name': raw.get('employer_name') or 'Unknown'},
+        'title':    raw.get('job_title') or '',
+        'description': raw.get('job_description') or '',
+        'location': {'display_name': location_str},
+        'redirect_url': raw.get('job_apply_link') or '#',
+        'created':  (raw.get('job_posted_at_datetime_utc') or '')[:10],
+    }
+
+
+def fetch_jobs_jsearch(
     keywords: List[str],
     location: str,
-    app_id: str,
-    app_key: str,
-    country: str = 'us',
+    api_key: str,
     max_results: int = 50,
 ) -> List[dict]:
     """
-    Fetch internship job listings from the Adzuna API.
+    Fetch internship job listings from the JSearch API (via RapidAPI).
+
+    Sign up free at https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch
+    Free tier: 200 requests / month.
 
     Args:
-        keywords: Role keywords extracted from the resume (e.g. ['software engineer', 'data analyst'])
-        location: City / region to search in (e.g. 'New York')
-        app_id: Adzuna App ID
-        app_key: Adzuna App Key
-        country: Two-letter country code (default 'us')
+        keywords: Role keywords extracted from the resume
+        location: City / region to search in (e.g. 'Hong Kong')
+        api_key: RapidAPI key
         max_results: Maximum total results to return
 
     Returns:
-        List of raw job dicts from the Adzuna API
+        List of normalised job dicts (same structure as Adzuna output)
     """
     all_jobs: List[dict] = []
-    results_per_page = 20
-    pages_needed = (max_results + results_per_page - 1) // results_per_page
+    results_per_page = 10
+    pages_needed = min((max_results + results_per_page - 1) // results_per_page, 10)
 
-    # Build the search query: combine role keywords with "intern" to target internships
-    role_query = ' OR '.join(keywords[:5]) if keywords else 'intern'
-    what = f"intern {role_query}"
+    # Use just the first keyword to keep the query broad enough to return results.
+    # JSearch is sensitive to overly specific queries — shorter is better.
+    role = keywords[0] if keywords else 'business'
+    location_str = location or 'Hong Kong'
+    queries_to_try = [
+        f"intern {role} {location_str}",
+        f"internship {location_str}",          # broad fallback
+    ]
 
-    for page in range(1, pages_needed + 1):
-        params = {
-            'app_id': app_id,
-            'app_key': app_key,
-            'results_per_page': results_per_page,
-            'what': what,
-            'content-type': 'application/json',
-        }
-        if location:
-            params['where'] = location
+    headers = {
+        'X-RapidAPI-Key':  api_key,
+        'X-RapidAPI-Host': 'jsearch.p.rapidapi.com',
+    }
 
-        url = f"https://api.adzuna.com/v1/api/jobs/{country}/search/{page}?{urlencode(params)}"
+    for query in queries_to_try:
+        print(f"   Query: \"{query}\"")
+        for page in range(1, pages_needed + 1):
+            params = {
+                'query':     query,
+                'page':      str(page),
+                'num_pages': '1',
+                # intentionally omit employment_types — many HK internships are not tagged
+            }
 
-        try:
-            with urllib.request.urlopen(url, timeout=15) as resp:
-                data = json.loads(resp.read().decode('utf-8'))
-                results = data.get('results', [])
-                if not results:
-                    break
-                all_jobs.extend(results)
-                if len(all_jobs) >= max_results:
-                    break
-                time.sleep(0.5)
+            url = f"https://jsearch.p.rapidapi.com/search?{urlencode(params)}"
+            req = urllib.request.Request(url, headers=headers)
 
-        except urllib.error.HTTPError as e:
-            print(f"❌ Adzuna API error (page {page}): HTTP {e.code}")
-            break
-        except Exception as e:
-            print(f"❌ Request failed (page {page}): {e}")
-            break
+            try:
+                with urllib.request.urlopen(req, timeout=15) as resp:
+                    data = json.loads(resp.read().decode('utf-8'))
+                    results = data.get('data', [])
+                    if not results:
+                        break
+                    all_jobs.extend(_normalize_jsearch_job(r) for r in results)
+                    if len(all_jobs) >= max_results:
+                        break
+                    time.sleep(0.5)
 
-    print(f"✅ Fetched {len(all_jobs)} jobs from Adzuna")
+            except urllib.error.HTTPError as e:
+                print(f"❌ JSearch API error (page {page}): HTTP {e.code}")
+                break
+            except Exception as e:
+                print(f"❌ Request failed (page {page}): {e}")
+                break
+
+        if all_jobs:
+            break   # got results — no need to try the fallback query
+
+    print(f"✅ Fetched {len(all_jobs)} jobs from JSearch")
     return all_jobs[:max_results]
 
 

@@ -28,10 +28,8 @@ def load_config(config_file: str = "config.txt") -> dict:
         'azure_endpoint': 'https://hkust.azure-api.net',
         'azure_model': 'gpt-5-mini',
         # Job search settings
-        'adzuna_app_id': None,
-        'adzuna_app_key': None,
-        'job_country': 'us',
-        'job_location': '',
+        'jsearch_api_key': None,
+        'job_location': 'Hong Kong',
         'job_top_n': 20,
         'resume_path': 'resume.txt',
         'target_companies': [],
@@ -80,12 +78,8 @@ def load_config(config_file: str = "config.txt") -> dict:
                     config['azure_endpoint'] = value
                 elif key == 'AZURE_MODEL':
                     config['azure_model'] = value
-                elif key == 'ADZUNA_APP_ID':
-                    config['adzuna_app_id'] = value
-                elif key == 'ADZUNA_APP_KEY':
-                    config['adzuna_app_key'] = value
-                elif key == 'JOB_COUNTRY':
-                    config['job_country'] = value
+                elif key == 'JSEARCH_API_KEY':
+                    config['jsearch_api_key'] = value
                 elif key == 'JOB_LOCATION':
                     config['job_location'] = value
                 elif key == 'JOB_TOP_N':

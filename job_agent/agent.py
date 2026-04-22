@@ -25,7 +25,7 @@ from openai import AzureOpenAI
 from email_sender import load_config, send_html_email
 from resume_parser import read_resume, extract_profile
 from job_finder import (
-    fetch_jobs_adzuna,
+    fetch_jobs_jsearch,
     filter_by_companies,
     rank_jobs,
     print_job_results,
@@ -49,14 +49,13 @@ def main():
         print(f"❌ Config error: {e}")
         sys.exit(1)
 
-    # Check Adzuna credentials
-    if not config.get('adzuna_app_id') or config['adzuna_app_id'] == 'your_app_id_here':
-        print("❌ Adzuna API credentials not set in config.txt")
-        print("   Sign up free at https://developer.adzuna.com and add ADZUNA_APP_ID and ADZUNA_APP_KEY")
+    # Check JSearch credentials
+    if not config.get('jsearch_api_key') or config['jsearch_api_key'] == 'your_rapidapi_key_here':
+        print("❌ JSEARCH_API_KEY not set in config.txt")
+        print("   Sign up free at https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch")
         sys.exit(1)
 
-    print(f"✅ Config loaded — job country: {config['job_country']}, "
-          f"location: {config['job_location']}, top_n: {config['job_top_n']}")
+    print(f"✅ Config loaded — location: {config['job_location']}, top_n: {config['job_top_n']}")
 
     # ------------------------------------------------------------------
     # 2. Read resume
@@ -94,18 +93,16 @@ def main():
     # ------------------------------------------------------------------
     # 4. Fetch jobs from Adzuna
     # ------------------------------------------------------------------
-    print(f"\n🔍 Fetching internship listings from Adzuna...")
-    jobs = fetch_jobs_adzuna(
+    print(f"\n🔍 Fetching internship listings from JSearch ({config['job_location']})...")
+    jobs = fetch_jobs_jsearch(
         keywords=profile['roles'],
         location=config['job_location'],
-        app_id=config['adzuna_app_id'],
-        app_key=config['adzuna_app_key'],
-        country=config['job_country'],
+        api_key=config['jsearch_api_key'],
         max_results=100,  # Fetch more before filtering, then trim to top_n
     )
 
     if not jobs:
-        print("⚠️  No jobs returned from Adzuna. Check your API credentials and search parameters.")
+        print("⚠️  No jobs returned from JSearch. Check your API key and search parameters.")
         sys.exit(0)
 
     # ------------------------------------------------------------------
