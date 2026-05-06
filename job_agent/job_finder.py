@@ -23,9 +23,9 @@ _MODEL: Optional[SentenceTransformer] = None
 def _get_model() -> SentenceTransformer:
     global _MODEL
     if _MODEL is None:
-        print("🔄 Loading embedding model...")
+        print("Loading embedding model...")
         _MODEL = SentenceTransformer('all-MiniLM-L6-v2')
-        print("✅ Embedding model ready")
+        print("Embedding model ready")
     return _MODEL
 
 
@@ -98,7 +98,6 @@ def fetch_jobs_jsearch(
                 'query':     query,
                 'page':      str(page),
                 'num_pages': '1',
-                # intentionally omit employment_types — many HK internships are not tagged
             }
 
             url = f"https://jsearch.p.rapidapi.com/search?{urlencode(params)}"
@@ -116,16 +115,16 @@ def fetch_jobs_jsearch(
                     time.sleep(0.5)
 
             except urllib.error.HTTPError as e:
-                print(f"❌ JSearch API error (page {page}): HTTP {e.code}")
+                print(f"JSearch API error (page {page}): HTTP {e.code}")
                 break
             except Exception as e:
-                print(f"❌ Request failed (page {page}): {e}")
+                print(f"Request failed (page {page}): {e}")
                 break
 
         if all_jobs:
             break   # got results — no need to try the fallback query
 
-    print(f"✅ Fetched {len(all_jobs)} jobs from JSearch")
+    print(f"Fetched {len(all_jobs)} jobs from JSearch")
     return all_jobs[:max_results]
 
 
@@ -155,7 +154,7 @@ def filter_by_companies(jobs: List[dict], company_whitelist: List[str]) -> List[
         if any(w in company_name for w in whitelist_lower):
             matched.append(job)
 
-    print(f"✅ {len(matched)} jobs match the company whitelist out of {len(jobs)} total")
+    print(f"{len(matched)} jobs match the company whitelist out of {len(jobs)} total")
     return matched
 
 
@@ -241,7 +240,7 @@ def _brand_color(company_name: str) -> str:
 
 def generate_company_bubble_image(
     ranked_jobs: List[dict],
-    doubao_api_key: str,
+    seedream_api_key: str,
     top_n: int = 20,
 ) -> Optional[str]:
     """
@@ -250,7 +249,7 @@ def generate_company_bubble_image(
 
     Args:
         ranked_jobs: Jobs sorted by similarity_score (output of rank_jobs)
-        doubao_api_key: Doubao (ByteDance Ark) API key
+        seedream_api_key: Doubao (ByteDance Ark) API key
         top_n: How many top jobs to use when counting company frequencies
 
     Returns:
@@ -258,7 +257,7 @@ def generate_company_bubble_image(
     """
     display = ranked_jobs[:top_n]
     if not display:
-        print("⚠️  No jobs to generate bubble image from")
+        print("No jobs to generate bubble image from")
         return None
 
     # Count jobs per company in the top-N results
@@ -279,27 +278,27 @@ def generate_company_bubble_image(
 
     prompt = f"""Create a modern, colorful bubble chart visualization of company job opportunities.
 
-Each bubble represents one company. Bubble size is proportional to the number of internship listings.
+                Each bubble represents one company. Bubble size is proportional to the number of internship listings.
 
-Companies and their brand colors:
-{bubble_desc}
+                Companies and their brand colors:
+                {bubble_desc}
 
-Design requirements:
-1. Each bubble is a perfect circle filled with the company's brand colors (gradient or solid)
-2. The company name is written in clean white bold text centered inside the bubble
-3. Bubble sizes clearly reflect the listing count — more listings = noticeably larger bubble
-4. Bubbles are tightly clustered together in a visually balanced composition, with slight overlaps allowed
-5. Background is clean white or very light grey
-6. No legends, axes, titles, or decorative borders
-7. Overall style: modern data visualization, flat design, professional"""
+                Design requirements:
+                1. Each bubble is a perfect circle 
+                2. The company name is written in clean white bold text centered inside the bubble
+                3. Bubble sizes clearly reflect the listing count — more listings = noticeably larger bubble
+                4. Bubbles are tightly clustered together in a visually balanced composition, with slight overlaps allowed
+                5. Background is clean white or very light grey
+                6. No legends, axes, titles, or decorative borders
+                7. Overall style: modern data visualization, flat design, professional"""
 
     try:
         client = OpenAI(
             base_url='https://ark.cn-beijing.volces.com/api/v3',
-            api_key=doubao_api_key,
+            api_key=seedream_api_key,
         )
 
-        print("🎨 Generating company bubble image...")
+        print("Generating company bubble image...")
         response = client.images.generate(
             model='doubao-seedream-5-0-260128',
             prompt=prompt,
@@ -309,11 +308,11 @@ Design requirements:
         )
 
         url = response.data[0].url
-        print(f"✅ Company bubble image generated!")
+        print(f"Company bubble image generated!")
         return url
 
     except Exception as e:
-        print(f"⚠️  Company bubble image generation failed: {e}")
+        print(f"Company bubble image generation failed: {e}")
         return None
 
 
@@ -326,7 +325,7 @@ def print_job_results(ranked_jobs: List[dict], top_n: int = 20) -> None:
     display = ranked_jobs[:top_n]
 
     if not display:
-        print("⚠️  No jobs to display.")
+        print("No jobs to display.")
         return
 
     print(f"\n{'='*80}")
@@ -375,7 +374,7 @@ def generate_job_report_html(
     summary_str = profile.get('summary', '')
 
     profile_html = f"""
-    <h2>👤 Candidate Profile</h2>
+    <h2>Candidate Profile</h2>
     <div style='background-color:#f0f7ff; padding:15px; border-left:4px solid #2196F3;
                 border-radius:4px; margin-bottom:20px;'>
         <p><strong>Summary:</strong> {summary_str}</p>
@@ -388,7 +387,7 @@ def generate_job_report_html(
     bubble_html = ''
     if image_url:
         bubble_html = """
-    <h2>🫧 Company Opportunity Map</h2>
+    <h2>Company Opportunity Map</h2>
     <div style='text-align:center; margin:20px 0;'>
         <img src='cid:heatmap_image'
              style='max-width:100%; height:auto; border-radius:10px;
@@ -431,7 +430,7 @@ def generate_job_report_html(
         """
 
     jobs_html = f"""
-    <h2>💼 Top {len(display)} Internship Matches</h2>
+    <h2>Top {len(display)} Internship Matches</h2>
     <table border='0' cellpadding='10' style='width:100%; border-collapse:collapse;'>
         <thead>
             <tr style='background:#f5f5f5;'>
@@ -483,7 +482,7 @@ def generate_job_report_html(
     </head>
     <body>
         <div class="container">
-            <h1>🎓 Internship Opportunities Report</h1>
+            <h1>Internship Opportunities Report</h1>
             <div style='color:#999; font-size:13px; margin:10px 0;'>Generated: {now}</div>
 
             {profile_html}

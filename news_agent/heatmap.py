@@ -3,7 +3,7 @@ from openai import OpenAI
 
 
 # Doubao API Key
-DOUBAO_API_KEY = "ark-3ebef06a-ba66-402d-9d1f-d17716f848f9-c3f3f"
+SEEDREAM_API_KEY = "ark-3ebef06a-ba66-402d-9d1f-d17716f848f9-c3f3f"
 
 
 # Heatmap prompt template - can be customized
@@ -75,7 +75,7 @@ def generate_heatmap(api_key=None, trending_keywords=None):
     Generate heatmap image using Doubao API
     
     Args:
-        api_key: API key for Doubao service (uses DOUBAO_API_KEY if None)
+        api_key: API key for Doubao service (uses SEEDREAM_API_KEY if None)
         trending_keywords: List of (keyword, count) tuples
     
     Returns:
@@ -83,7 +83,7 @@ def generate_heatmap(api_key=None, trending_keywords=None):
     """
     # Use default Doubao API key if not provided
     if api_key is None or not api_key.startswith('ark-'):
-        api_key = DOUBAO_API_KEY
+        api_key = SEEDREAM_API_KEY
     
     client = OpenAI(
         base_url="https://ark.cn-beijing.volces.com/api/v3",

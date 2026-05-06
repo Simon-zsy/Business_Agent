@@ -34,7 +34,7 @@ def load_config(config_file: str = "config.txt") -> dict:
         'resume_path': 'resume.txt',
         'target_companies': [],
         # Image generation
-        'doubao_api_key': None,
+        'seedream_api_key': None,
     }
 
     in_keywords_section = False
@@ -86,8 +86,8 @@ def load_config(config_file: str = "config.txt") -> dict:
                     config['job_top_n'] = int(value)
                 elif key == 'RESUME_PATH':
                     config['resume_path'] = value
-                elif key == 'DOUBAO_API_KEY':
-                    config['doubao_api_key'] = value
+                elif key == 'SEEDREAM_API_KEY':
+                    config['seedream_api_key'] = value
 
                 in_keywords_section = False
                 in_companies_section = False
@@ -181,17 +181,17 @@ def send_html_email(
         
         if image_url:
             try:
-                print(f"📥 Downloading image from {image_url[:50]}...")
+                print(f"Downloading image from {image_url[:50]}...")
                 image_data = urllib.request.urlopen(image_url).read()
                 image = MIMEImage(image_data)
                 image.add_header('Content-ID', '<heatmap_image>')
                 image.add_header('Content-Disposition', 'inline', filename='heatmap.png')
                 msg.attach(image)
-                print("✅ Image attached to email")
+                print("Image attached to email")
             except Exception as e:
-                print(f"⚠️  Warning: Failed to attach image: {e}")
-        
-        print(f"🔐 Connecting to SMTP: {smtp_server}:{smtp_port}")
+                print(f"Warning: Failed to attach image: {e}")
+
+        print(f"Connecting to SMTP: {smtp_server}:{smtp_port}")
         
         try:
             if use_tls:
@@ -204,21 +204,21 @@ def send_html_email(
             server.send_message(msg, from_addr=from_email, to_addrs=to_emails)
             server.quit()
             
-            print(f"✅ Email sent successfully to {', '.join(to_emails)}")
+            print(f"Email sent successfully to {', '.join(to_emails)}")
             return True
-        
+
         except smtplib.SMTPAuthenticationError:
-            print("❌ Email send failed: Authentication error. Check email and password/auth code.")
+            print("Email send failed: Authentication error. Check email and password/auth code.")
             return False
         except smtplib.SMTPConnectError:
-            print(f"❌ Email send failed: Cannot connect to {smtp_server}:{smtp_port}")
+            print(f"Email send failed: Cannot connect to {smtp_server}:{smtp_port}")
             return False
         except Exception as e:
-            print(f"❌ Email send failed: {str(e)}")
+            print(f"Email send failed: {str(e)}")
             return False
-    
+
     except Exception as e:
-        print(f"❌ Error: {str(e)}")
+        print(f"Error: {str(e)}")
         import traceback
         traceback.print_exc()
         return False
@@ -239,7 +239,7 @@ def generate_report_with_heatmap(
     
     keywords_html = ""
     if trending_keywords:
-        keywords_html = "<h2>🔥 Trending Keywords</h2><table border='1' cellpadding='10' style='width:100%; border-collapse:collapse;'>"
+        keywords_html = "<h2>Trending Keywords</h2><table border='1' cellpadding='10' style='width:100%; border-collapse:collapse;'>"
         for rank, (keyword, count) in enumerate(trending_keywords[:15], 1):
             bar_length = min(count * 5, 100)
             keywords_html += f"""
@@ -255,7 +255,7 @@ def generate_report_with_heatmap(
     heatmap_html = ""
     if image_url:
         heatmap_html = f"""
-        <h2>📊 Keyword Heatmap</h2>
+        <h2>Keyword Heatmap</h2>
         <div style='text-align: center; margin: 20px 0;'>
             <img src='cid:heatmap_image' style='max-width: 100%; height: auto; border-radius: 8px;'>
         </div>
@@ -264,7 +264,7 @@ def generate_report_with_heatmap(
     summary_html = ""
     if summary_text:
         summary_html = f"""
-        <h2>🧠 AI-Generated Summary</h2>
+        <h2>AI-Generated Summary</h2>
         <div style='background-color: #f0f7ff; padding: 15px; border-left: 4px solid #2196F3; border-radius: 4px; margin-bottom: 20px;'>
             <p style='color: #333; line-height: 1.6; margin: 0;'>{summary_text}</p>
         </div>
@@ -279,13 +279,13 @@ def generate_report_with_heatmap(
         if top_keyword in articles_by_keyword:
             articles_by_keyword[top_keyword].append(article)
     
-    articles_html = "<h2>📰 News by Category</h2>"
+    articles_html = "<h2>News by Category</h2>"
     article_count = 0
     
     for keyword in keywords_list:
         keyword_articles = articles_by_keyword.get(keyword, [])
         if keyword_articles:
-            articles_html += f"<h3 style='color: #ff6b6b; margin-top: 20px;'>📌 {keyword.upper()} ({len(keyword_articles)} articles)</h3>"
+            articles_html += f"<h3 style='color: #ff6b6b; margin-top: 20px;'>{keyword.upper()} ({len(keyword_articles)} articles)</h3>"
             
             for article in keyword_articles[:5]:  
                 article_count += 1
@@ -381,7 +381,7 @@ def generate_report_with_heatmap(
     </head>
     <body>
         <div class="container">
-            <h1>🚀 {title}</h1>
+            <h1>{title}</h1>
             <div class="timestamp">Generated: {now}</div>
             
             {keywords_html}
@@ -479,13 +479,13 @@ if __name__ == "__main__":
         )
         
         if success:
-            print("✅ Successfully sent test email with generated report!")
+            print("Successfully sent test email with generated report!")
         else:
-            print("❌ Failed to send test email. Please check the configuration.")
-    
+            print("Failed to send test email. Please check the configuration.")
+
     except FileNotFoundError as e:
-        print(f"❌ Error: {e}")
+        print(f"Error: {e}")
         print("Please edit the config.txt file and enter your email information.")
     except ValueError as e:
-        print(f"❌ Error: {e}")
+        print(f"Error: {e}")
         print("Please check the config.txt file for missing configurations.")

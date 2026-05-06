@@ -100,11 +100,11 @@ Return ONLY valid JSON, no markdown, no explanation."""
         }
 
     except json.JSONDecodeError:
-        print("⚠️  Could not parse profile JSON from model, using fallback extraction")
+        print("Could not parse profile JSON from model, using fallback extraction")
         # Fallback: return raw text as summary only
         return {'skills': [], 'roles': ['intern', 'internship'], 'summary': resume_text[:200]}
     except Exception as e:
-        print(f"❌ Error extracting profile: {e}")
+        print(f"Error extracting profile: {e}")
         return {'skills': [], 'roles': ['intern', 'internship'], 'summary': ''}
 
 

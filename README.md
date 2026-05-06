@@ -185,7 +185,7 @@ JSEARCH_API_KEY=your_rapidapi_key
 JOB_LOCATION=Hong Kong
 JOB_TOP_N=20
 RESUME_PATH=resume.txt
-DOUBAO_API_KEY=your_doubao_api_key
+SEEDREAM_API_KEY=your_seedream_api_key
 
 # Target Companies
 Google

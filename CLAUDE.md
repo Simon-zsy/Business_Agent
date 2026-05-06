@@ -47,7 +47,7 @@ earnings
 ## API Keys
 
 - **GNews API key**: hardcoded in `news.py` as `API_KEY`
-- **Doubao (ByteDance) API key**: hardcoded in `heatmap.py` as `DOUBAO_API_KEY`
+- **Doubao (ByteDance) API key**: hardcoded in `heatmap.py` as `SEEDREAM_API_KEY`
 - **Azure OpenAI key**: read from `config.txt`
 - **Email credentials**: read from `config.txt` (Gmail requires an App Password, not the account password)
 
